@@ -6,11 +6,27 @@ buildscript {
     ext.kotlin_version = '1.5.31'
     ext.build_gradle_version = '7.0.3'
     repositories {
-        if (!System.getenv().containsKey("DISABLE_TENCENT_MAVEN_MIRROR")) {
-            maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
-        } else {
-            google()
-            jcenter()
+        google()
+        jcenter()
+        Properties properties = new Properties()
+        def propertiesFile = project.rootProject.file('local.properties')
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.newDataInputStream())
+
+            if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+                def user = properties.getProperty('gpr.user')
+                def key = properties.getProperty('gpr.key')
+                maven {
+                    name = "GitHubPackages"
+                    credentials {
+                        username = user
+                        password = key
+                    }
+                    url "https://maven.pkg.github.com/${user}/shadow"
+                }
+
+            }
+
         }
     }
     dependencies {
@@ -25,11 +41,27 @@ allprojects {
     group 'com.tencent.shadow.core'
     buildscript {
         repositories {
-            if (!System.getenv().containsKey("DISABLE_TENCENT_MAVEN_MIRROR")) {
-                maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
-            } else {
-                google()
-                jcenter()
+            google()
+            jcenter()
+            Properties properties = new Properties()
+            def propertiesFile = project.rootProject.file('local.properties')
+            if (propertiesFile.exists()) {
+                properties.load(propertiesFile.newDataInputStream())
+
+                if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+                    def user = properties.getProperty('gpr.user')
+                    def key = properties.getProperty('gpr.key')
+                    maven {
+                        name = "GitHubPackages"
+                        credentials {
+                            username = user
+                            password = key
+                        }
+                        url "https://maven.pkg.github.com/${user}/shadow"
+                    }
+
+                }
+
             }
         }
     }

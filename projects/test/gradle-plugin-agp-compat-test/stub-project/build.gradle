@@ -1,12 +1,27 @@
 buildscript {
     repositories {
-        if (!System.getenv().containsKey("DISABLE_TENCENT_MAVEN_MIRROR")) {
-            maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
-        } else {
-            google()
-            jcenter()
+        google()
+        jcenter()
+        Properties properties = new Properties()
+        def propertiesFile = project.rootProject.file('local.properties')
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.newDataInputStream())
+
+            if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+                def user = properties.getProperty('gpr.user')
+                def key = properties.getProperty('gpr.key')
+                maven {
+                    name = "GitHubPackages"
+                    credentials {
+                        username = user
+                        password = key
+                    }
+                    url "https://maven.pkg.github.com/${user}/shadow"
+                }
+
+            }
+
         }
-        mavenLocal()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$TestAGPVersion"
@@ -24,11 +39,27 @@ allprojects {
     ext.VERSION_CODE = 1
     ext.VERSION_NAME = "local"
     repositories {
-        if (!System.getenv().containsKey("DISABLE_TENCENT_MAVEN_MIRROR")) {
-            maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
-        } else {
-            google()
-            jcenter()
+        google()
+        jcenter()
+        Properties properties = new Properties()
+        def propertiesFile = project.rootProject.file('local.properties')
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.newDataInputStream())
+
+            if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+                def user = properties.getProperty('gpr.user')
+                def key = properties.getProperty('gpr.key')
+                maven {
+                    name = "GitHubPackages"
+                    credentials {
+                        username = user
+                        password = key
+                    }
+                    url "https://maven.pkg.github.com/${user}/shadow"
+                }
+
+            }
+
         }
     }
 }
@@ -54,11 +85,26 @@ dependencies {
 }
 
 repositories {
-    if (!System.getenv().containsKey("DISABLE_TENCENT_MAVEN_MIRROR")) {
-        maven { url 'https://mirrors.tencent.com/nexus/repository/maven-public/' }
-    } else {
-        google()
-        jcenter()
+    google()
+    jcenter()
+    Properties properties = new Properties()
+    def propertiesFile = project.rootProject.file('local.properties')
+    if (propertiesFile.exists()) {
+        properties.load(propertiesFile.newDataInputStream())
+
+        if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+            def user = properties.getProperty('gpr.user')
+            def key = properties.getProperty('gpr.key')
+            maven {
+                name = "GitHubPackages"
+                credentials {
+                    username = user
+                    password = key
+                }
+                url "https://maven.pkg.github.com/${user}/shadow"
+            }
+
+        }
+
     }
-    mavenLocal()
 }
