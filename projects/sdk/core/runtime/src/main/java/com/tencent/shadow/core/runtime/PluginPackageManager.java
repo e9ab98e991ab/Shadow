@@ -7,8 +7,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
-
 import android.content.pm.ServiceInfo;
+
 import java.util.List;
 
 public interface PluginPackageManager {
@@ -27,4 +27,6 @@ public interface PluginPackageManager {
     ResolveInfo resolveActivity(Intent intent, int flags);
 
     ResolveInfo resolveService(Intent intent, int flags);
+
+    String getArchiveFilePath();
 }
