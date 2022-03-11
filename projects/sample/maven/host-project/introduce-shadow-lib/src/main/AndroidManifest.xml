@@ -15,7 +15,7 @@
         <activity
             android:name="com.tencent.shadow.sample.runtime.PluginDefaultProxyActivity"
             android:launchMode="standard"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
             android:hardwareAccelerated="true"
             android:theme="@style/PluginContainerActivity"
@@ -24,7 +24,7 @@
         <activity
             android:name="com.tencent.shadow.sample.runtime.PluginSingleInstance1ProxyActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
             android:hardwareAccelerated="true"
             android:theme="@style/PluginContainerActivity"
@@ -33,7 +33,7 @@
         <activity
             android:name="com.tencent.shadow.sample.runtime.PluginSingleTask1ProxyActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
             android:hardwareAccelerated="true"
             android:theme="@style/PluginContainerActivity"

@@ -84,12 +84,12 @@
         </activity>
 
         <activity android:name=".DefaultContainerActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
             />
 
         <activity android:name=".SingleTaskContainerActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="landscape"
             android:launchMode="singleTask"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
             />
