@@ -33,9 +33,6 @@ final class ManagerImplLoader extends ImplLoader {
             {
                     "com.tencent.shadow.core.common",
                     "com.tencent.shadow.dynamic.host",
-                    "com.stvgame.pay.virtual",
-                    "com.stvgame.pay.virtual.*",
-                    "com.stvgame.pay.virtual.**"
             };
     final private Context applicationContext;
     final private InstalledApk installedApk;
