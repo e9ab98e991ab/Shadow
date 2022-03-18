@@ -117,7 +117,7 @@ public class PluginConfig {
             }
         }
         //todo #27 json的版本检查和不兼容检查
-        pluginConfig.UUID = configJson.getString("UUID");
+        pluginConfig.UUID = configJson.getString("UUID").substring(24);
         pluginConfig.UUID_NickName = configJson.getString("UUID_NickName");
 
         JSONObject loaderJson = configJson.optJSONObject("pluginLoader");
