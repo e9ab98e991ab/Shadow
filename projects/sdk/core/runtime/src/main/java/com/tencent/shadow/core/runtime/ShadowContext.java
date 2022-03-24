@@ -31,6 +31,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 
@@ -268,31 +269,45 @@ public class ShadowContext extends SubDirContextThemeWrapper {
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        Intent tIntent = super.registerReceiver(tBroadcastReceiverWrapper, filter);
+        Log.i("ZQ", "2tBroadcastReceiverWrapper：" + tBroadcastReceiverWrapper + "  action:" + filter.getAction(0));
+        return tIntent;
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, int flags) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, flags);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        Log.i("ZQ", "3tBroadcastReceiverWrapper：" + tBroadcastReceiverWrapper + "  action:" + filter.getAction(0));
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, flags);
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, String broadcastPermission, Handler scheduler) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, broadcastPermission, scheduler);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        Log.i("ZQ", "4tBroadcastReceiverWrapper：" + tBroadcastReceiverWrapper + "  action:" + filter.getAction(0));
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, broadcastPermission, scheduler);
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, String broadcastPermission, Handler scheduler, int flags) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, broadcastPermission, scheduler, flags);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        Log.i("ZQ", "5tBroadcastReceiverWrapper：" + tBroadcastReceiverWrapper + "  action:" + filter.getAction(0));
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, broadcastPermission, scheduler, flags);
     }
 
     @Override
     public void unregisterReceiver(BroadcastReceiver receiver) {
-        BroadcastReceiverWrapper wrapper = receiverToWrapper(receiver);
-        if (wrapper != null) {
-            super.unregisterReceiver(wrapper);
-        } else {
-            super.unregisterReceiver(receiver);
+        synchronized (mReceiverWrapperMap){
+            WeakReference<BroadcastReceiverWrapper> weakReference
+                    = mReceiverWrapperMap.get(receiver);
+            BroadcastReceiverWrapper tWrapper = weakReference == null ? null : weakReference.get();
+            if (null != tWrapper) {
+                super.unregisterReceiver(tWrapper);
+            } else {
+                super.unregisterReceiver(receiver);
+            }
+            mReceiverWrapperMap.remove(receiver);
         }
     }
 
