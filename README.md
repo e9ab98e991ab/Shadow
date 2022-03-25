@@ -14,5 +14,5 @@
 > 1.0.7   2022/3/9, 增加日志输出
 > 1.0.8   2022/3/9, 插件里的 so 库路径名称太长加载不成功  pluginConfig.UUID 改为 pluginConfig.UUID.substring(5)
 > 1.0.10  2022/3/9  
-> 1.0.15  2022/3/14 BroadcastReceiver崩溃问题
+> 1.0.15  2022/3/14 BroadcastReceiver崩溃问题 (可用)
 > 1.0.17  2022/3/24 ShadowApplication初始化setShadowApplication (bug)
