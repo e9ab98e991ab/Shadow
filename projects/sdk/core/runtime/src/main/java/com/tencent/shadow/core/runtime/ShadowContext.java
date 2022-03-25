@@ -31,11 +31,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 
 import com.tencent.shadow.core.runtime.container.GeneratedHostActivityDelegator;
 import com.tencent.shadow.core.runtime.container.HostActivityDelegator;
+
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class ShadowContext extends SubDirContextThemeWrapper {
     PluginComponentLauncher mPluginComponentLauncher;
@@ -47,6 +52,21 @@ public class ShadowContext extends SubDirContextThemeWrapper {
     ApplicationInfo mApplicationInfo;
     protected String mPartKey;
     private String mBusinessName;
+    /**
+     * BroadcastReceiver到BroadcastReceiverWrapper对象到映射关系
+     * <p>
+     * 采用WeakHashMap<BroadcastReceiver, WeakReference<BroadcastReceiverWrapper>>
+     * 使key和value都采用弱引用持有，以保持原本BroadcastReceiver的GC回收时机。
+     * <p>
+     * BroadcastReceiver由原有业务代码强持有（也可能不持有），BroadcastReceiver原本在registerReceiver
+     * 之后交由系统持有，现在由BroadcastReceiverWrapper代替它被系统强持有。
+     * 所以BroadcastReceiverWrapper强引用持有BroadcastReceiver，保持了系统强引用BroadcastReceiver的关系。
+     * <p>
+     * 如果业务原本没有持有BroadcastReceiver，也就不会再有unregisterReceiver调用来，
+     * 也就不需要Map中有wrapper对应关系，所以用弱引用持有此关系没有影响。
+     */
+    final private Map<BroadcastReceiver, WeakReference<BroadcastReceiverWrapper>>
+            mReceiverWrapperMap = new WeakHashMap<>();
 
     public ShadowContext() {
     }
@@ -249,31 +269,41 @@ public class ShadowContext extends SubDirContextThemeWrapper {
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        Intent tIntent = super.registerReceiver(tBroadcastReceiverWrapper, filter);
+        return tIntent;
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, int flags) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, flags);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, flags);
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, String broadcastPermission, Handler scheduler) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, broadcastPermission, scheduler);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, broadcastPermission, scheduler);
     }
 
     @Override
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, String broadcastPermission, Handler scheduler, int flags) {
-        return super.registerReceiver(receiverToWrapper(receiver), filter, broadcastPermission, scheduler, flags);
+        BroadcastReceiverWrapper tBroadcastReceiverWrapper = receiverToWrapper(receiver);
+        return super.registerReceiver(tBroadcastReceiverWrapper, filter, broadcastPermission, scheduler, flags);
     }
 
     @Override
     public void unregisterReceiver(BroadcastReceiver receiver) {
-        BroadcastReceiverWrapper wrapper = receiverToWrapper(receiver);
-        if (wrapper != null) {
-            super.unregisterReceiver(wrapper);
-        } else {
-            super.unregisterReceiver(receiver);
+        synchronized (mReceiverWrapperMap){
+            WeakReference<BroadcastReceiverWrapper> weakReference
+                    = mReceiverWrapperMap.get(receiver);
+            BroadcastReceiverWrapper tWrapper = weakReference == null ? null : weakReference.get();
+            if (null != tWrapper) {
+                super.unregisterReceiver(tWrapper);
+            } else {
+                super.unregisterReceiver(receiver);
+            }
+            mReceiverWrapperMap.remove(receiver);
         }
     }
 
@@ -284,6 +314,18 @@ public class ShadowContext extends SubDirContextThemeWrapper {
     }
 
     private BroadcastReceiverWrapper receiverToWrapper(BroadcastReceiver receiver) {
-        return mShadowApplication.receiverToWrapper(receiver);
+        if (receiver == null) {
+            return null;
+        }
+        synchronized (mReceiverWrapperMap) {
+            WeakReference<BroadcastReceiverWrapper> weakReference
+                    = mReceiverWrapperMap.get(receiver);
+            BroadcastReceiverWrapper wrapper = weakReference == null ? null : weakReference.get();
+            if (wrapper == null) {
+                wrapper = new BroadcastReceiverWrapper(receiver, this);
+                mReceiverWrapperMap.put(receiver, new WeakReference<>(wrapper));
+            }
+            return wrapper;
+        }
     }
 }
