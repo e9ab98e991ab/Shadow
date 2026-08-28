@@ -457,13 +457,19 @@ publishing {
             if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
                 def user = properties.getProperty('gpr.user')
                 def key = properties.getProperty('gpr.key')
+                //配置了gpr.url时发布到该仓库（如阿里云云效Maven），否则发布到GitHub Packages
+                def repoUrl = properties.getProperty('gpr.url')
                 maven {
                     name = "GitHubPackages"
                     credentials {
                         username = user
                         password = key
                     }
-                    url "https://maven.pkg.github.com/${user}/shadow"
+                    if (repoUrl != null) {
+                        url repoUrl
+                    } else {
+                        url "https://maven.pkg.github.com/${user}/shadow"
+                    }
                 }
 
                 useLocalCredential = true
